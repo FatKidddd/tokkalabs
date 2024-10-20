@@ -1,13 +1,17 @@
-import express from "express"
-import { Request, Response } from "express"
+import express, { Request, Response } from "express";
+import txnFeeRouter from './routes/txnfeeRoutes';
 
-const app = express()
-const port = 3000
+const swaggerUi = require('swagger-ui-express');
+const swaggerDoc = require('./swagger');
 
-app.get("/", (req: Request, res: Response) => {
-  res.send("Hello")
-})
+const app = express();
+app.use(express.json());
 
-app.listen(port, () => {
-  console.log(`Server is running on port ${port}`)
-})
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDoc));
+
+app.use('/txnfee', txnFeeRouter);
+
+const port = 3000;
+app.listen(port, () => console.log(`Server running on port ${port}`));
+
+
