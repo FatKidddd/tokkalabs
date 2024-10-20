@@ -41,7 +41,7 @@ Use `yarn`.
     - else:
       - query tx hash from etherscan
         - parse fields
-      - using timeStamp, query binance API klines with startTime = timeStamp - epsilon, endTime = timeStamp + epsilon, where epsiolon is probably some seconds
+      - using timeStamp, query binance API klines with startTime = timeStamp - epsilon, endTime = timeStamp + epsilon, where epsilon is probably some seconds
         - mid = (low + high) / 2
       - add to db
       - return USDT tx fee
@@ -49,8 +49,6 @@ Use `yarn`.
 - (Batch job) (startTime, endTime) -> transactions with all their prices
   - function that takes in (startTime, endTime) -> populate db
   - split into multiple batches by pagination limit of binance and etherscan api
-  - (not implemented) making this more efficient by avoiding repeated queries
-    - can be done by querying in db all txns within time period, then make query for every time period gap between each txn.
 
 ### DB schema
 
@@ -68,13 +66,14 @@ Useful Binance API
 [historical data](https://developers.binance.com/docs/binance-spot-api-docs/rest-api#klinecandlestick-data) - use klines / candlesticks OHLC
 
 Useful Etherscan API
-[live data]() - websocket ERC20 transfers
-[historical]() - convert timestamps into closest blocks, query using start and end blocks
+[live data](https://web3js.readthedocs.io/en/v1.2.11/web3-eth-subscribe.html) - websocket ERC20 transfers
+[historical](https://docs.etherscan.io/api-endpoints/accounts#get-a-list-of-erc20-token-transfer-events-by-address) - convert timestamps into closest blocks, query using start and end blocks
 
 ### Further improvements
 
 - Use Redis for caching
-- Improve batch processing functionality as mentioned above
+- (not implemented) making batch processing more efficient by avoiding repeated queries
+  - can be done by querying in db all txns within time period, then make query for every time period gap between each txn.
 - Inaccurate pricing dependent on timeframe given to binance API -> should add in uncertainty / another field for resolution
 
 ## License
