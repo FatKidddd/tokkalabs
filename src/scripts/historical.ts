@@ -1,135 +1,125 @@
 import axios from 'axios';
 import { ETHERSCAN_API_KEY, ETHERSCAN_API_URL, UNISWAP_USDC_ETH_POOL_ADDRESS } from './constants';
+import { TxnFee } from '@/models/txnfeeModel';
+import { calculateTxnFeeUSDT } from './utils';
+import _ from 'lodash';
 
-// Function to fetch transactions from Etherscan
-async function fetchTransactions() {
+interface HistoricalTxn {
+  blockNumber: string,
+  timeStamp: string,
+  hash: string,
+  nonce: string,
+  blockHash: string,
+  from: string,
+  contractAddress: string,
+  to: string,
+  value: string,
+  tokenName: string,
+  tokenSymbol: string,
+  tokenDecimal: string,
+  transactionIndex: string,
+  gas: string,
+  gasPrice: string,
+  gasUsed: string,
+  cumulativeGasUsed: string,
+  input: string,
+  confirmations: string,
+};
+
+async function getHistoricalTxnsByBlockRange(startBlock: number, endBlock: number) {
+  const averageQueryBlockRange = 30000;
+  const timesToQuery = Math.ceil((endBlock - startBlock) / averageQueryBlockRange);
+  // add zod range limit here
+  const finalTxnFees: TxnFee[] = [];
+  for (let i = 0; i < timesToQuery; i++) {
+    const partialTxnFees = await queryHistoricalTxns(
+      startBlock + averageQueryBlockRange * i,
+      Math.min(endBlock, startBlock + averageQueryBlockRange * (i + 1))
+    );
+
+    const pricesETHUSDT = await Promise.all(
+      partialTxnFees.map(partialTxnFee => getBinancePrice(partialTxnFee.timeStamp))
+    );
+
+    const txnFees = _.zipWith(partialTxnFees, pricesETHUSDT, (partialTxnFee, priceETHUSDT) => {
+      const txnFee: TxnFee = {
+        ...partialTxnFee,
+        priceETHUSDT,
+        txnFeeUSDT: calculateTxnFeeUSDT(partialTxnFee.gasPrice, partialTxnFee.gasUsed, priceETHUSDT)
+      };
+      return txnFee;
+    });
+
+    // write to db
+  }
+  return finalTxnFees;
+}
+
+async function queryHistoricalTxns(startBlock: number, endBlock: number) {
+  // about ~30000 blocks range assuming 10000 long result is returned
   try {
-    const response = await axios.get(`${ETHERSCAN_API_URL}`, {
+    const response = await axios.get(ETHERSCAN_API_URL, {
       params: {
         module: 'account',
         action: 'tokentx',
         address: UNISWAP_USDC_ETH_POOL_ADDRESS,
         page: 1,
-        offset: 100,
-        startblock: 0, // change these
-        endblock: 21005992, // change these
+        offset: 10000, // page * offset max can only be 10000
+        startblock: startBlock,
+        endblock: endBlock,
         sort: 'asc',
         apikey: ETHERSCAN_API_KEY
       }
     });
 
-    const transactions = response.data.result;
+    const transactions: HistoricalTxn[] = response.data.result;
 
-    // Map the transaction data to get [tx hash, timestamp, gas used, gas price]
-    const txData = transactions.map(tx => {
-      return [
-        tx.hash,
-        parseInt(tx.timeStamp),
-        BigInt(tx.gasUsed),
-        BigInt(tx.gasPrice)
-      ];
+    // because of different transfer instructions in one transaction
+    const incompleteTxnFees: { [id: string]: Omit<TxnFee, "priceETHUSDT" | "txnFeeUSDT"> } = {};
+    transactions.forEach(tx => {
+      incompleteTxnFees[tx.hash] = {
+        id: tx.hash,
+        timeStamp: parseInt(tx.timeStamp),
+        gasUsed: BigInt(tx.gasUsed),
+        gasPrice: BigInt(tx.gasPrice)
+      };
     });
-
-    return txData;
+    return incompleteTxnFees;
   } catch (error) {
     console.error('Error fetching transactions from Etherscan:', error);
-    return [];
+    return {};
   }
 }
 
-// Function to fetch ETH/USDT price from Binance API
-async function getETHPriceInUSDT() {
+
+async function getBinancePrice(timeStamp: number) {
+  const timePadding = 2 * 1000; // 2 seconds on each side
+
+  const baseUrl = 'https://api.binance.com/api/v3/klines';
   try {
-    const response = await axios.get(BINANCE_API_URL, {
+    const response = await axios.get(baseUrl, {
       params: {
-        symbol: 'ETHUSDT'  // Fetching average price for ETH/USDT
+        symbol: 'ETHUSDT',
+        interval: '1s',
+        startTime: timeStamp - timePadding,
+        endTime: timeStamp + timePadding,
+        limit: 10,
       }
     });
-
-    const ethPrice = parseFloat(response.data.price);
-    return ethPrice;
-  } catch (error) {
-    console.error('Error fetching ETH price from Binance:', error);
-    return null;
-  }
-}
-
-// Function to add USDT value to each transaction based on gas price and ETH price
-async function addUSDTFeeToTransactions(txData) {
-  const ethPriceInUSDT = await getETHPriceInUSDT();
-  if (!ethPriceInUSDT) {
-    console.error('Unable to fetch ETH price. Skipping fee calculations.');
-    return txData;
-  }
-
-  const updatedTxData = txData.map(tx => {
-    const [txHash, timestamp, gasUsed, gasPriceWei] = tx;
-    const gasPriceGwei = gasPriceWei / 1e9;
-    const txFeeETH = (gasUsed * gasPriceGwei) / 1e9; // Convert to ETH (Wei to Ether)
-    const txFeeUSDT = txFeeETH * ethPriceInUSDT;
-    return [...tx, txFeeUSDT];
-  });
-  return updatedTxData;
-}
-
-// Main function to run the entire process
-(async () => {
-  // Step 1: Fetch transactions from Etherscan
-  const transactions = await fetchTransactions();
-  if (transactions.length === 0) {
-    console.log('No transactions found.');
-    return;
-  }
-
-  // Step 2: Add USDT fee to each transaction
-  const transactionsWithUSDT = await addUSDTFeeToTransactions(transactions);
-
-  // Output the final result
-  console.log('Transactions with USDT fee:', transactionsWithUSDT);
-})();
-
-// Function to query Binance API for candlestick data
-async function getBinanceKlines(symbol, interval, startTime, endTime) {
-  const baseUrl = 'https://api.binance.com/api/v3/klines';
-
-  try {
-    // Prepare query parameters
-    const params = {
-      symbol: symbol,       // e.g., 'ETHUSDT'
-      interval: interval,   // e.g., '1m' for 1-minute candlesticks
-      startTime: startTime, // Optional: start time in milliseconds
-      endTime: endTime,     // Optional: end time in milliseconds
-      limit: 500            // Optional: Max number of results (default: 500)
-    };
-
-    // Send the GET request
-    const response = await axios.get(baseUrl, { params });
-
-    // The response data contains an array of klines
     const klines = response.data;
-
-    // Print the first kline for demonstration
-    console.log('Kline:', klines[0]);
-
-    return klines;
+    console.log(klines);
+    return getAvgPriceFromKlines(klines);
   } catch (error) {
     console.error('Error fetching klines from Binance:', error);
   }
 }
 
-
-
-// Example Usage
-// Define the symbol and interval, and optional start and end times
-const symbol = 'ETHUSDT';
-const interval = '1m';  // 1-minute interval
-const startTime = Date.now() - 60 * 60 * 1000;  // 1 hour ago in milliseconds
-const endTime = Date.now();  // Current time
-
-// Query Binance API
-getBinanceKlines(symbol, interval, startTime, endTime);
-
-
+function getAvgPriceFromKlines(klines: any[]) {
+  // add type + zod for validation here in future
+  const sumOfAvg = klines.reduce((prev, cur) => (parseFloat(klines[2]) + parseFloat(klines[3])) / 2); // mid = (high + low) price
+  const avgPrice = sumOfAvg / klines.length;
+  return avgPrice;
+}
 
 /*
 "result": [

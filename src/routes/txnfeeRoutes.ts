@@ -1,5 +1,5 @@
 import express from 'express';
-import { getTxnFee, postProcessTimePeriod } from '@/controllers/txnfeeController';
+import { getTxnFee, postProcessBlockRange } from '@/controllers/txnfeeController';
 
 const router = express.Router();
 
@@ -31,15 +31,15 @@ router.get('/', getTxnFee);
  *           schema:
  *             type: object
  *             required:
- *               - startTime
- *               - endTime
+ *               - startBlock
+ *               - endBlock
  *             properties:
- *               startTime:
+ *               startBlock:
  *                 type: number
- *                 description: milliseconds timestamp to process txns from
- *               endTime:
+ *                 description: start block number to process txns from
+ *               endBlock:
  *                 type: number
- *                 description: milliseconds timestamp
+ *                 description: end block number
  *     responses:
  *       201:
  *         description: Returns historical list of txns with fields [tx_hash, timeStamp, gasUsed, gasPrice, binance rate, USDT fee].
@@ -48,7 +48,7 @@ router.get('/', getTxnFee);
  *       500:
  *         description: Internal server error.
  */
-router.post('/process', postProcessTimePeriod);
+router.post('/process', postProcessBlockRange);
 
 
 export default router;

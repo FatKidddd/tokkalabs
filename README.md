@@ -46,8 +46,8 @@ Use `yarn`.
       - add to db
       - return USDT tx fee
 
-- (Batch job) (startTime, endTime) -> transactions with all their prices
-  - function that takes in (startTime, endTime) -> populate db
+- (Batch job) (startBlock, endBlock) -> transactions with all their prices
+  - function that takes in (startBlock, endBlock) -> populate db
   - split into multiple batches by pagination limit of binance and etherscan api
 
 ### DB schema

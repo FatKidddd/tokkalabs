@@ -4,6 +4,7 @@ import { BINANCE_WSS_URL, INFURA_API_KEY, INFURA_RPC_WSS_URL, UNISWAP_USDC_ETH_P
 import { abi } from './contractData';
 import invariant from 'tiny-invariant';
 import { TxnFee } from '@/models/txnfeeModel';
+import { calculateTxnFeeUSDT } from './utils';
 
 const web3 = new Web3(
   !INFURA_API_KEY // server is currently down
@@ -21,19 +22,17 @@ export async function createTxnFeeFromSwapEvent(data: EventLog, latestETHUSDT: [
   const gasPrice = BigInt(transaction.gasPrice); // might want to use BN here
   const gasUsed = transactionReceipt.gasUsed;
   const [priceETHUSDT, timeStamp] = latestETHUSDT; // priceETHUSDT is 1 eth = ~2600 usdt
-  const txnFeeEth = parseFloat(web3.utils.fromWei(gasPrice * gasUsed, 'ether'));
 
   const delayThreshold = 3 * 1000; // 3 seconds
   invariant(swapEventTime + delayThreshold >= timeStamp, "Latency is too huge which will cause inaccurate prices");
-  const feeUSDT = priceETHUSDT * txnFeeEth;
 
   return {
     id: transactionReceipt.transactionHash,
     timeStamp,
     gasUsed,
     gasPrice,
-    binanceETHUSDT: priceETHUSDT,
-    txnFeeUSDT: feeUSDT
+    priceETHUSDT: priceETHUSDT,
+    txnFeeUSDT: calculateTxnFeeUSDT(gasPrice, gasUsed, priceETHUSDT)
   };
 };
 
@@ -55,15 +54,19 @@ export function processLive() {
   const contract = new web3.eth.Contract(abi, contractAddress, web3.getContextObject());
   const swapEvent = contract.events.Swap();
 
-  swapEvent.on("data", (data) => {
+  swapEvent.on("data", async (data) => {
     if (latestETHUSDT !== null) {
-      createTxnFeeFromSwapEvent(data, latestETHUSDT);
+      const txnFee = await createTxnFeeFromSwapEvent(data, latestETHUSDT);
+      console.log(txnFee);
     }
   });
   swapEvent.on("error", (error) => console.log("swapEvent error", error));
 }
 
-// - write to db functionality
 // - do historical
+// - write tests
+// - write to db functionality
+// - write tests
 // - make endpoints
 // - write tests
+// - dockerize

@@ -1,6 +1,6 @@
 import { test, expect } from 'vitest';
 import { EventLog } from 'web3';
-import { createTxnFeeFromSwapEvent } from './live';
+import { createTxnFeeFromSwapEvent } from '../live';
 
 test('createTxnFeeFromSwapEvent works with sample swapEvent and binance data', async () => {
   const swapEventSample: EventLog = {
