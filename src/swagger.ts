@@ -1,22 +1,22 @@
-import swaggerJsdoc from 'swagger-jsdoc';
+import swaggerJsdoc from "swagger-jsdoc"
 
 const options = {
   definition: {
-    openapi: '3.0.0',
+    openapi: "3.0.0",
     info: {
-      title: 'Uniswap USDC/ETH Transaction Fees in USDT',
-      version: '1.0.0',
-      description: '',
+      title: "Uniswap USDC/ETH Transaction Fees in USDT",
+      version: "1.0.0",
+      description: "",
     },
     servers: [
       {
-        url: 'http://localhost:3000',
+        url: "http://localhost:3000",
       },
     ],
   },
-  apis: ['./src/routes/*.ts', './src/controllers/*.ts'],
-};
+  apis: ["./src/routes/*.ts", "./src/controllers/*.ts"],
+}
 
-const specs = swaggerJsdoc(options);
+const specs = swaggerJsdoc(options)
 
-module.exports = specs;
+module.exports = specs

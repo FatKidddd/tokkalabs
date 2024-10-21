@@ -18,7 +18,6 @@ Use `yarn`.
 - `test`: Run tests using Vitest.
 - `test:lint`: Run linting tests using Vitest.
 
-
 ## Planning
 
 ### Tasks
@@ -34,6 +33,7 @@ Use `yarn`.
 ### Functionality
 
 - (Tx hash) -> USDT tx fee
+
   - find in db
     - if found:
       - retrieve from db
@@ -57,7 +57,7 @@ Use `yarn`.
 3. gasUsed
 4. gasPrice
 5. binance USDT/ETH price
-6. tx fee in USDT = (gasUsed * gasPrice) * binance USDT/ETH
+6. tx fee in USDT = (gasUsed _ gasPrice) _ binance USDT/ETH
 
 ### Notes
 
@@ -81,4 +81,3 @@ Useful Etherscan API
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details
 
 [Boilerplate](https://github.com/yan-pi/NodeBoilerplate) with TypeScript, Express, ESLint, Prettier, Husky + Lint-staged, and Vitest
-

@@ -1,7 +1,10 @@
-import express from 'express';
-import { getTxnFee, postProcessBlockRange } from '@/controllers/txnfeeController';
+import express from "express"
+import {
+  getTxnFee,
+  postProcessBlockRange,
+} from "@/controllers/txnfeeController"
 
-const router = express.Router();
+const router = express.Router()
 
 /**
  * @swagger
@@ -15,8 +18,7 @@ const router = express.Router();
  *       500:
  *         description: Internal server error.
  */
-router.get('/', getTxnFee);
-
+router.get("/", getTxnFee)
 
 /**
  * @swagger
@@ -48,7 +50,6 @@ router.get('/', getTxnFee);
  *       500:
  *         description: Internal server error.
  */
-router.post('/process', postProcessBlockRange);
+router.post("/process", postProcessBlockRange)
 
-
-export default router;
+export default router

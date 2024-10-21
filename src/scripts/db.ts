@@ -1,2 +1,1 @@
-export function writeToDB() { };
-
+export function writeToDB() {}
