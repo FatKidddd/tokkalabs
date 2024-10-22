@@ -1,0 +1,19 @@
+version: '3.8'
+services:
+  db:
+    image: postgres:14
+    container_name: txnfeesdb
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: pass
+      POSTGRES_DB: txnfeesdb
+    ports:
+      - "5432:5432"
+    volumes:
+      - dbdata:/var/lib/postgresql/data
+      - ./initdb:/docker-entrypoint-initdb.d
+
+volumes:
+  dbdata:
+

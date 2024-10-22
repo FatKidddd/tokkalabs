@@ -1,32 +1,32 @@
 import WebSocket from "ws"
 import { EventLog, Web3 } from "web3"
-import {
-  BINANCE_WSS_URL,
-  INFURA_API_KEY,
-  INFURA_RPC_WSS_URL,
-  UNISWAP_USDC_ETH_POOL_ADDRESS,
-} from "@/constants"
+import { BINANCE_WSS_URL, UNISWAP_USDC_ETH_POOL_ADDRESS } from "@/constants"
 import { abi } from "./contractData"
 import invariant from "tiny-invariant"
 import { TxnFee } from "@/models/txnfeeModel"
 import { calculateTxnFeeUSDT } from "./utils"
-import { insertTxnFee } from "./db"
+import { insertTxnFees } from "./db"
 
-const web3 = new Web3(
-  !INFURA_API_KEY // server is currently down
-    ? `${INFURA_RPC_WSS_URL}/${INFURA_API_KEY}`
-    : "wss://eth-mainnet.ws.alchemyapi.io/ws/demo",
-)
+const web3 = new Web3("wss://eth-mainnet.ws.alchemyapi.io/ws/demo")
 
 export async function createTxnFeeFromSwapEvent(
   data: EventLog,
   latestETHUSDT: [number, number],
-): Promise<TxnFee> {
+) {
+  const txnHash = data.transactionHash as string
+  const txnFee = await createTxnFeeFromTxnHash(txnHash, latestETHUSDT)
+  return txnFee as TxnFee
+}
+
+export async function createTxnFeeFromTxnHash(
+  txnHash: string,
+  latestETHUSDT: [number, number],
+): Promise<TxnFee | undefined> {
   const swapEventTime = Date.now()
 
   const [transactionReceipt, transaction] = await Promise.all([
-    web3.eth.getTransactionReceipt(data.transactionHash as string),
-    web3.eth.getTransaction(data.transactionHash as string),
+    web3.eth.getTransactionReceipt(txnHash),
+    web3.eth.getTransaction(txnHash),
   ])
   const gasPrice = BigInt(transaction.gasPrice) // might want to use BN here
   const gasUsed = transactionReceipt.gasUsed
@@ -74,7 +74,7 @@ export function processLive() {
     if (latestETHUSDT !== null) {
       const txnFee = await createTxnFeeFromSwapEvent(data, latestETHUSDT)
       console.log("New transaction occurred on Uniswap pool", txnFee)
-      await insertTxnFee(txnFee)
+      await insertTxnFees([txnFee])
     }
   })
   swapEvent.on("error", (error) => console.log("swapEvent error", error))

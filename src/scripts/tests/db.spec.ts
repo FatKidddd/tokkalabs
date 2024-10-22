@@ -1,6 +1,6 @@
 import { test, expect } from "vitest"
 import {
-  insertTxnFee,
+  insertTxnFees,
   getTxnFee,
   deleteTxnFee,
   dbHealthCheck,
@@ -33,15 +33,15 @@ test("postgreSQL DB is up and connected", async () => {
   expect(res).toBe(true)
 })
 
-test("insertTxnFee works with sample", async () => {
-  const res = await insertTxnFee(sampleTxnFee)
+test("insertTxnFees works with sample", async () => {
+  const res = await insertTxnFees([sampleTxnFee])
   expect(res).toBe(true)
 
   await deleteTxnFee(sampleTxnFee.id)
 })
 
 test("getTxnFee works with sample", async () => {
-  await insertTxnFee(sampleTxnFee)
+  await insertTxnFees([sampleTxnFee])
 
   const res = await getTxnFee(sampleTxnFee.id)
   expect(res).toEqual(sampleTxnFee)
@@ -55,7 +55,7 @@ test("getTxnFee fails to find tx hash not in DB", async () => {
 })
 
 test("deleteTxnFee works when data exists", async () => {
-  await insertTxnFee(sampleTxnFee)
+  await insertTxnFees([sampleTxnFee])
 
   const res = await deleteTxnFee(sampleTxnFee.id)
   expect(res).toBe(true)

@@ -24,20 +24,35 @@ export async function dbHealthCheck() {
   }
 }
 
-export async function insertTxnFee(txnFee: TxnFee) {
-  const query = `
-    INSERT INTO txnfees ("id", "timeStamp", "gasUsed", "gasPrice", "priceETHUSDT", "txnFeeUSDT")
-    VALUES ($1, $2, $3, $4, $5, $6)
-  `
+export async function insertTxnFees(txnFees: TxnFee[]) {
+  // Base query for inserting multiple rows
+  const baseQuery = `
+        INSERT INTO txnfees ("id", "timeStamp", "gasUsed", "gasPrice", "priceETHUSDT", "txnFeeUSDT")
+        VALUES
+    `
 
-  const values = [
+  // Generate the placeholders dynamically depending on the number of rows
+  const valuePlaceholders = txnFees
+    .map(
+      (_, i) =>
+        `($${i * 6 + 1}, $${i * 6 + 2}, $${i * 6 + 3}, $${i * 6 + 4}, $${
+          i * 6 + 5
+        }, $${i * 6 + 6})`,
+    )
+    .join(", ")
+
+  // Combine the base query with the generated value placeholders
+  const query = baseQuery + valuePlaceholders
+
+  // Flatten the values into a single array
+  const values = txnFees.flatMap((txnFee) => [
     txnFee.id,
     txnFee.timeStamp,
     txnFee.gasUsed,
     txnFee.gasPrice,
     txnFee.priceETHUSDT,
     txnFee.txnFeeUSDT,
-  ]
+  ])
 
   const client = await pool.connect()
   try {

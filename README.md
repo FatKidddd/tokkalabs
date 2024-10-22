@@ -1,41 +1,32 @@
-# Overview
-
-## Getting Started
+# Getting Started
 
 1. Clone this repository: `git clone git@github.com:FatKidddd/tokkalabs.git`
 2. Navigate to the project directory: `cd tokkalabs`
-3. Create a .env file from .env.local, fill in missing API keys `cp .env.local .env`
-4. Start db & express server (takes 3 mins to build): `sudo docker-compose up --build`
-5. Visit [http://localhost:3000/api-docs](http://localhost:3000/api-docs) to interact with Swagger UI
+3. Create a .env file from .env.local `cp .env.local .env`, fill in missing API key
 
-### DB commands
+## Run in Dev (preferred)
+
+1. Start db: `sudo docker-compose -f db-only.yml up -d`
+2. Install deps: `yarn install`
+3. Run tests to verify: `yarn test`
+4. Run express server & script: `yarn start:dev`
+5. Visit [http://localhost:3000/api-docs](http://localhost:3000/api-docs) to interact with Swagger UI
+6. `sudo docker-compose down` to stop all services
+
+Note: to setup precommit linting + prettier `yarn husky:prepare`
+
+### Database commands (to view live addition of txn fees in db)
 
 1. To access db: `sudo docker exec -it txnfeesdb psql -U user -d txnfeesdb`
 2. To view all txnfees `SELECT * from txnfees;`
 
-### Local dev (to see tests, can't seem to log vitest output in docker-compose)
-1. Ensure db server is up (need to split dockerized db and express server in future)
-2. `yarn install`
-3. `yarn test`
+## Production (can't see tests & takes long to build too)
 
-## Scripts
-
-Use `yarn`.
-
-- `start`: Start the server using `tsx src/server.ts`.
-- `build`: Build the project using `tsup src`.
-- `start:dev`: Start the server in development mode using `tsx watch src/server.ts`.
-- `husky:prepare`: Install Husky hooks.
-- `test`: Run tests using Vitest.
-- `test:lint`: Run linting tests using Vitest.
+1. Start db & express server (takes 3 mins to build): `sudo docker-compose up --build`
+2. Visit [http://localhost:3000/api-docs](http://localhost:3000/api-docs) to interact with Swagger UI
+3. `sudo docker-compose down` to stop all services
 
 ## Planning
-
-### Endpoints
-
-- GET /transaction_fee/(txn_hash)
-- POST /transaction_fee/
-  - body: { startTime: timeStamp, endTime: timeStamp }
 
 ### Functionality
 

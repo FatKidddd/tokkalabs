@@ -8,7 +8,7 @@ const router = express.Router()
  * /txnfee/{txn_hash}:
  *   get:
  *     summary: Get Uniswapv3 USDC/ETH txn fee in USDT
- *     description: Returns USDT fee for a specific transaction based on txn_hash.
+ *     description: Returns USDT fee for a specific transaction based on txn_hash. Tries to retrieves from db, if not pull from api.
  *     parameters:
  *       - name: txn_hash
  *         in: path
@@ -28,8 +28,8 @@ router.get("/:txn_hash", queryTxnFee)
  * @swagger
  * /txnfee/process:
  *   post:
- *     summary: Batch process Uniswapv3 USDC/ETH txn fees in USDT
- *     description: Processes the transaction fees within the specified block range. The block range is limited to 1000 blocks at a time.
+ *     summary: Batch process Uniswapv3 USDC/ETH txn fees in USDT within specified block range.
+ *     description: Limited to 10000 blocks at a time. Historical txn fees are inserted into db. 100 blocks is about instant processing time, above will have noticeably lag.
  *     requestBody:
  *       required: true
  *       content:
