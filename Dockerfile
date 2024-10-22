@@ -11,3 +11,4 @@ EXPOSE 3000
 
 CMD yarn test:lint
 CMD yarn start
+# CMD yarn start:dev

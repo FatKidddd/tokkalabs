@@ -4,11 +4,10 @@
 
 1. Clone this repository: `git clone git@github.com:FatKidddd/tokkalabs.git`
 2. Navigate to the project directory: `cd tokkalabs`
-3. Install dependencies: `yarn install`
-4. Create a .env file from .env.local, fill in missing API keys
-5. Start server: `sudo docker-compose up -d`
-6. Visit [http://localhost:3000/api-docs](http://localhost:3000/api-docs) to interact with Swagger UI
-7. To stop server: `sudo docker-compose down`
+3. Create a .env file from .env.local, fill in missing API keys `cp .env.local .env`
+4. Start server: `sudo docker-compose up --build`
+5. Visit [http://localhost:3000/api-docs](http://localhost:3000/api-docs) to interact with Swagger UI
+6. To stop server: `sudo docker-compose down`
 
 ### DB commands
 
@@ -28,44 +27,39 @@ Use `yarn`.
 
 ## Planning
 
-### Tasks
-
-- Get transaction fee in USDT for all Uniswap WETH USDC txns with the below functionality
-
 ### Endpoints
 
-- GET /transaction_fee/(tx_hash)
+- GET /transaction_fee/(txn_hash)
 - POST /transaction_fee/
   - body: { startTime: timeStamp, endTime: timeStamp }
 
 ### Functionality
 
-- (Tx hash) -> USDT tx fee
+- (txn hash) -> USDT txn fee
 
   - find in db
     - if found:
       - retrieve from db
-      - return USDT tx fee
+      - return USDT txn fee
     - else:
-      - query tx hash from etherscan
+      - query txn hash from etherscan
         - parse fields
       - using timeStamp, query binance API klines with startTime = timeStamp - epsilon, endTime = timeStamp + epsilon, where epsilon is probably some seconds
         - mid = (low + high) / 2
       - add to db
-      - return USDT tx fee
+      - return USDT txn fee
 
 - (Batch job) (startBlock, endBlock) -> transactions with all their prices
   - function that takes in (startBlock, endBlock) -> populate db
-  - split into multiple batches by pagination limit of binance and etherscan api
 
 ### DB schema
 
-1. tx hash
+1. txn hash
 2. timeStamp
 3. gasUsed
 4. gasPrice
-5. binance USDT/ETH price
-6. tx fee in USDT = (gasUsed _ gasPrice) _ binance USDT/ETH
+5. binance ETHUSDT price
+6. txn fee in USDT
 
 ### Notes
 
@@ -81,7 +75,7 @@ Useful Etherscan API
 
 - Use Redis for caching
 - (not implemented) making batch processing more efficient by avoiding repeated queries
-  - can be done by querying in db all txns within time period, then make query for every time period gap between each txn.
+- (not implemented) make batch processing able to handle larger query range
 - Inaccurate pricing dependent on timeframe given to binance API -> should add in uncertainty / another field for resolution
 
 ## License
