@@ -6,6 +6,15 @@
 2. Navigate to the project directory: `cd tokkalabs`
 3. Install dependencies: `yarn install`
 4. Start the server: `yarn start`
+5. Start db: `sudo docker-compose up -d`
+6. Ensure all tests pass: `yarn test`
+7. Run server:
+
+### DB commands
+
+1. To access db: `sudo docker exec -it txnfeesdb psql -U user -d txnfeesdb`
+2. To view all txnfees `SELECT * from txnfees;`
+3. To stop db: `sudo docker-compose down`
 
 ## Scripts
 

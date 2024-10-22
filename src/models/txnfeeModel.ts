@@ -6,3 +6,7 @@ export interface TxnFee {
   priceETHUSDT: number
   txnFeeUSDT: number // (gasUsed * gasPrice) * binance USDT / ETH
 }
+
+export type TxnFeeDB = {
+  [K in keyof TxnFee]: string
+}
