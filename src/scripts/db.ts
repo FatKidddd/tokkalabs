@@ -2,7 +2,7 @@ import { TxnFee, TxnFeeDB } from "@/models/txnfeeModel"
 import { Pool } from "pg"
 
 const pool = new Pool({
-  host: "localhost",
+  host: "db",
   port: 5432,
   user: "user",
   password: "pass",

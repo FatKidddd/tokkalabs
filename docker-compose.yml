@@ -3,6 +3,7 @@ services:
   db:
     image: postgres:14
     container_name: txnfeesdb
+    restart: unless-stopped
     environment:
       POSTGRES_USER: user
       POSTGRES_PASSWORD: pass
@@ -12,31 +13,24 @@ services:
     volumes:
       - dbdata:/var/lib/postgresql/data
       - ./initdb:/docker-entrypoint-initdb.d
-    networks:
-      - backend
-
-  # app:
-  #   depends_on:
-  #     - db
-  #   build: ./app
-  #   restart: always
-  #   env_file: ./.env
-  #   # ports:
-  #   #   - $NODE_LOCAL_PORT:$NODE_DOCKER_PORT
-  #   environment:
-  #     - BINANCE_WSS_URL=$BINANCE_WSS_URL
-  #     - BINANCE_API_URL=$BINANCE_API_URL
-  #     - ETHERSCAN_API_URL=$ETHERSCAN_API_URL
-  #     - INFURA_RPC_WSS_URL=$INFURA_RPC_WSS_URL
-  #     - ETHERSCAN_API_KEY=$ETHERSCAN_API_KEY
-  #     - INFURA_API_KEY=$INFURA_API_KEY
-  #   stdin_open: true
-  #   tty: true
-# need to change ports
+  app:
+    depends_on:
+      - db
+    build:
+      context: .
+    restart: unless-stopped
+    env_file: ./.env
+    ports:
+      - "3000:3000"
+    environment:
+      - BINANCE_WSS_URL=$BINANCE_WSS_URL
+      - BINANCE_API_URL=$BINANCE_API_URL
+      - ETHERSCAN_API_URL=$ETHERSCAN_API_URL
+      - INFURA_RPC_WSS_URL=$INFURA_RPC_WSS_URL
+      - ETHERSCAN_API_KEY=$ETHERSCAN_API_KEY
+      - INFURA_API_KEY=$INFURA_API_KEY
+    stdin_open: true
+    tty: true
 
 volumes:
   dbdata:
-
-networks:
-  backend:
-
