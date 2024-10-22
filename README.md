@@ -13,9 +13,10 @@
 1. To access db: `sudo docker exec -it txnfeesdb psql -U user -d txnfeesdb`
 2. To view all txnfees `SELECT * from txnfees;`
 
-### Local dev (need to split dockerized db and express server in future)
-1. `yarn install`
-2. `yarn test`
+### Local dev (to see tests, can't seem to log vitest output in docker-compose)
+1. Ensure db server is up (need to split dockerized db and express server in future)
+2. `yarn install`
+3. `yarn test`
 
 ## Scripts
 
