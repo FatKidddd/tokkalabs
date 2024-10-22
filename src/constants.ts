@@ -2,6 +2,7 @@ import dotenv from "dotenv"
 import invariant from "tiny-invariant"
 dotenv.config()
 
+export const DB_HOST = process.env.DB_HOST || "localhost"
 export const UNISWAP_USDC_ETH_POOL_ADDRESS =
   "0x88e6a0c2ddd26feeb64f039a2c41296fcb3f5640"
 export const BINANCE_WSS_URL = process.env.BINANCE_WSS_URL as string

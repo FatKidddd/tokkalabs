@@ -23,6 +23,7 @@ services:
     ports:
       - "3000:3000"
     environment:
+      - DB_HOST=db
       - BINANCE_WSS_URL=$BINANCE_WSS_URL
       - BINANCE_API_URL=$BINANCE_API_URL
       - ETHERSCAN_API_URL=$ETHERSCAN_API_URL

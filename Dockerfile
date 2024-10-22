@@ -4,7 +4,7 @@ FROM base AS builder
 WORKDIR /app
 COPY package.json yarn.lock .yarnrc.yml ./
 RUN yarn set version stable
-RUN yarn install
+RUN yarn install 
 COPY . .
 
 EXPOSE 3000

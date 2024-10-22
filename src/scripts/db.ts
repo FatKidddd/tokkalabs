@@ -1,8 +1,9 @@
+import { DB_HOST } from "@/constants"
 import { TxnFee, TxnFeeDB } from "@/models/txnfeeModel"
 import { Pool } from "pg"
 
 const pool = new Pool({
-  host: "db",
+  host: DB_HOST,
   port: 5432,
   user: "user",
   password: "pass",
