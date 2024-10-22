@@ -1,4 +1,9 @@
 FROM postgres:14
+FROM node:20
 
-EXPOSE 5432
-
+WORKDIR /app
+COPY package.json .
+RUN yarn install
+COPY . .
+CMD yarn test:lint
+CMD yarn start

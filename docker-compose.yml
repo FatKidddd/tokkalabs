@@ -15,6 +15,25 @@ services:
     networks:
       - backend
 
+  # app:
+  #   depends_on:
+  #     - db
+  #   build: ./app
+  #   restart: always
+  #   env_file: ./.env
+  #   # ports:
+  #   #   - $NODE_LOCAL_PORT:$NODE_DOCKER_PORT
+  #   environment:
+  #     - BINANCE_WSS_URL=$BINANCE_WSS_URL
+  #     - BINANCE_API_URL=$BINANCE_API_URL
+  #     - ETHERSCAN_API_URL=$ETHERSCAN_API_URL
+  #     - INFURA_RPC_WSS_URL=$INFURA_RPC_WSS_URL
+  #     - ETHERSCAN_API_KEY=$ETHERSCAN_API_KEY
+  #     - INFURA_API_KEY=$INFURA_API_KEY
+  #   stdin_open: true
+  #   tty: true
+# need to change ports
+
 volumes:
   dbdata:
 

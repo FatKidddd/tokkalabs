@@ -41,7 +41,7 @@ export async function insertTxnFee(txnFee: TxnFee) {
   const client = await pool.connect()
   try {
     await client.query(query, values)
-    console.log("Txn fee inserted successfully")
+    // console.log("Txn fee inserted successfully")
     return true
   } catch (err) {
     console.error("Error inserting txn fee", err)
@@ -72,10 +72,10 @@ export async function deleteTxnFee(txnHash: string) {
   try {
     const result = await client.query(deleteQuery, [txnHash])
     if (result.rowCount !== null && result.rowCount > 0) {
-      console.log(`Transaction with id ${txnHash} deleted successfully.`)
+      // console.log(`Transaction with id ${txnHash} deleted successfully.`)
       return true
     } else {
-      console.log(`No transaction found with id ${txnHash}.`)
+      // console.log(`No transaction found with id ${txnHash}.`)
       return false
     }
   } catch (err) {
@@ -85,7 +85,9 @@ export async function deleteTxnFee(txnHash: string) {
   }
 }
 
-export function convertTxnFeeDB(txnfeeDB: TxnFeeDB) {
+export function convertTxnFeeDB(txnfeeDB: TxnFeeDB | undefined) {
+  if (txnfeeDB === undefined) return undefined
+
   const { id, timeStamp, gasUsed, gasPrice, priceETHUSDT, txnFeeUSDT } =
     txnfeeDB
   const txnfee: TxnFee = {
@@ -97,4 +99,13 @@ export function convertTxnFeeDB(txnfeeDB: TxnFeeDB) {
     txnFeeUSDT: parseFloat(txnFeeUSDT),
   }
   return txnfee
+}
+
+export function convertTxnFee(txnFee: TxnFee | undefined) {
+  if (txnFee === undefined) return undefined
+
+  const txnFeeDB = Object.fromEntries(
+    Object.entries(txnFee).map(([key, value]) => [key, String(value)]),
+  ) as TxnFeeDB
+  return txnFeeDB
 }

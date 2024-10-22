@@ -5,16 +5,15 @@
 1. Clone this repository: `git clone git@github.com:FatKidddd/tokkalabs.git`
 2. Navigate to the project directory: `cd tokkalabs`
 3. Install dependencies: `yarn install`
-4. Start the server: `yarn start`
-5. Start db: `sudo docker-compose up -d`
-6. Ensure all tests pass: `yarn test`
-7. Run server:
+4. Create a .env file from .env.local, fill in missing API keys
+5. Start server: `sudo docker-compose up -d`
+6. Visit [http://localhost:3000/api-docs](http://localhost:3000/api-docs) to interact with Swagger UI
+7. To stop server: `sudo docker-compose down`
 
 ### DB commands
 
 1. To access db: `sudo docker exec -it txnfeesdb psql -U user -d txnfeesdb`
 2. To view all txnfees `SELECT * from txnfees;`
-3. To stop db: `sudo docker-compose down`
 
 ## Scripts
 

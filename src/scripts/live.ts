@@ -5,11 +5,12 @@ import {
   INFURA_API_KEY,
   INFURA_RPC_WSS_URL,
   UNISWAP_USDC_ETH_POOL_ADDRESS,
-} from "./constants"
+} from "@/constants"
 import { abi } from "./contractData"
 import invariant from "tiny-invariant"
 import { TxnFee } from "@/models/txnfeeModel"
 import { calculateTxnFeeUSDT } from "./utils"
+import { insertTxnFee } from "./db"
 
 const web3 = new Web3(
   !INFURA_API_KEY // server is currently down
@@ -72,16 +73,9 @@ export function processLive() {
   swapEvent.on("data", async (data) => {
     if (latestETHUSDT !== null) {
       const txnFee = await createTxnFeeFromSwapEvent(data, latestETHUSDT)
-      console.log(txnFee)
+      console.log("New transaction occurred on Uniswap pool", txnFee)
+      await insertTxnFee(txnFee)
     }
   })
   swapEvent.on("error", (error) => console.log("swapEvent error", error))
 }
-
-// - do historical
-// - write tests
-// - write to db functionality
-// - write tests
-// - make endpoints
-// - write tests
-// - dockerize

@@ -5,8 +5,9 @@ import {
   deleteTxnFee,
   dbHealthCheck,
   convertTxnFeeDB,
+  convertTxnFee,
 } from "../db"
-import { TxnFee, TxnFeeDB } from "@/models/txnfeeModel"
+import { TxnFee } from "@/models/txnfeeModel"
 
 const sampleTxnFee: TxnFee = {
   id: "0xsampletxhash",
@@ -17,12 +18,14 @@ const sampleTxnFee: TxnFee = {
   txnFeeUSDT: 42.01,
 }
 
-const sampleTxnFeeDB = Object.fromEntries(
-  Object.entries(sampleTxnFee).map(([key, value]) => [key, String(value)]),
-) as TxnFeeDB
+const sampleTxnFeeDB = convertTxnFee(sampleTxnFee)
 
 test("convertTxnFeeDB works (convert values from string to type fields)", () => {
   expect(convertTxnFeeDB(sampleTxnFeeDB)).toEqual(sampleTxnFee)
+})
+
+test("convertTxnFee works (convert values to string)", () => {
+  expect(convertTxnFee(sampleTxnFee)).toEqual(sampleTxnFeeDB)
 })
 
 test("postgreSQL DB is up and connected", async () => {

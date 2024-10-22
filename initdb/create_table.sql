@@ -1,5 +1,5 @@
 CREATE TABLE IF NOT EXISTS txnfees (
-    id VARCHAR(64) PRIMARY KEY, -- tx_hash
+    id VARCHAR(100) PRIMARY KEY, -- tx_hash
     "timeStamp" BIGINT NOT NULL,
     "gasUsed" BIGINT NOT NULL,
     "gasPrice" BIGINT NOT NULL,
