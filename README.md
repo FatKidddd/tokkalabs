@@ -4,7 +4,7 @@
 2. Navigate to the project directory: `cd tokkalabs`
 3. Create a .env file from .env.local `cp .env.local .env`, fill in missing API key
 
-## Run in Dev (preferred)
+## Development (preferred)
 
 1. Start db: `sudo docker-compose -f db-only.yml up -d`
 2. Install deps: `yarn install`
@@ -13,14 +13,14 @@
 5. Visit [http://localhost:3000/api-docs](http://localhost:3000/api-docs) to interact with Swagger UI
 6. `sudo docker-compose down` to stop all services
 
-Note: to setup precommit linting + prettier `yarn husky:prepare`
+Note: to set up pre-commit linting + prettier `yarn husky:prepare`
 
 ### Database commands (to view live addition of txn fees in db)
 
 1. To access db: `sudo docker exec -it txnfeesdb psql -U user -d txnfeesdb`
 2. To view all txnfees `SELECT * from txnfees;`
 
-## Production (can't see tests & takes long to build too)
+## Production (takes a while to build & can't see tests log)
 
 1. Start db & express server (takes 3 mins to build): `sudo docker-compose up --build`
 2. Visit [http://localhost:3000/api-docs](http://localhost:3000/api-docs) to interact with Swagger UI
