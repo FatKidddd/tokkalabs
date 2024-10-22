@@ -5,7 +5,7 @@
 1. Clone this repository: `git clone git@github.com:FatKidddd/tokkalabs.git`
 2. Navigate to the project directory: `cd tokkalabs`
 3. Create a .env file from .env.local, fill in missing API keys `cp .env.local .env`
-4. Start server: `sudo docker-compose up --build`
+4. Start server (takes 3 mins to build): `sudo docker-compose up --build`
 5. Visit [http://localhost:3000/api-docs](http://localhost:3000/api-docs) to interact with Swagger UI
 6. To stop server: `sudo docker-compose down`
 
